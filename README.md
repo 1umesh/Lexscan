@@ -1,4 +1,6 @@
 # LexScan — AI Contract Intelligence
+<img width="1466" height="802" alt="Screenshot 2026-03-09 at 6 12 26 PM" src="https://github.com/user-attachments/assets/b1e83c55-9edb-499b-83b2-61bea58da4cb" />
+
 
 A professional legal contract analyser powered by Gemini AI. Upload any contract (PDF, DOCX, TXT) and get:
 
@@ -70,6 +72,8 @@ legal-analyzer/
 └── frontend/
     └── index.html              # Complete UI — no framework needed
 ```
+
+
 
 ---
 
