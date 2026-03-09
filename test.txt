@@ -1,0 +1,23 @@
+
+SERVICE AGREEMENT
+This Service Agreement ("Agreement") is entered into as of January 15, 2025, between TechCorp Solutions Pvt. Ltd., a company incorporated under the laws of India ("Service Provider"), and GlobalRetail Enterprises Inc., a Delaware corporation ("Client").
+1. SERVICES
+Service Provider agrees to provide software development and maintenance services as directed by the Client at any time and for any purpose deemed necessary by the Client in its sole discretion. The Client may change the scope of work without notice and without any obligation to compensate for additional work performed.
+2. PAYMENT TERMS
+Client shall pay Service Provider a monthly retainer of $5,000. Payment shall be made within 90 days of invoice. Client reserves the right to withhold payment indefinitely if it determines, in its sole judgment, that deliverables are unsatisfactory. Service Provider waives all rights to interest on late payments.
+3. INTELLECTUAL PROPERTY
+All work product, inventions, code, designs, and any other materials created by Service Provider, whether during working hours or personal time, whether related to the Agreement or not, shall be the exclusive property of the Client. Service Provider irrevocably assigns all present and future intellectual property rights to the Client worldwide.
+4. CONFIDENTIALITY
+Service Provider shall keep all Client information confidential. This obligation shall survive termination of this Agreement and shall remain in effect permanently and irrevocably, with no geographic limitation.
+5. TERMINATION
+Client may terminate this Agreement immediately at any time without cause and without any notice. Upon termination, Service Provider shall not be entitled to any compensation for work completed but not yet invoiced. Service Provider may not terminate this Agreement without providing 180 days written notice and paying a termination penalty of $50,000.
+6. LIABILITY
+Service Provider shall be liable for any and all damages, losses, costs, and expenses arising from or related to the services, whether direct, indirect, incidental, or consequential, without limitation. Client's liability to Service Provider shall be limited to $1 in all circumstances.
+7. NON-COMPETE
+Service Provider agrees not to provide services to any company, anywhere in the world, in any industry, for a period of 5 years following termination of this Agreement.
+8. DISPUTE RESOLUTION
+All disputes shall be resolved exclusively in courts located in Delaware, USA. Service Provider waives any right to a jury trial. Service Provider shall bear all legal costs regardless of the outcome of any dispute.
+9. AMENDMENTS
+Client may amend any term of this Agreement at any time by providing 24-hour email notice to Service Provider. Continued performance of services shall constitute acceptance of any amendments.
+10. GOVERNING LAW
+This Agreement shall be governed by the laws of Delaware, USA.

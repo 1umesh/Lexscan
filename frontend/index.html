@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LexScan — AI Contract Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0f0f0f;
+      --paper: #f7f5f0;
+      --parchment: #ede9e0;
+      --cream: #faf8f3;
+      --gold: #b8962e;
+      --gold-light: #d4af5a;
+      --gold-pale: #f0e6c4;
+      --red: #c0392b;
+      --red-pale: #fdecea;
+      --orange: #d4681a;
+      --orange-pale: #fdf0e4;
+      --green: #1a6b42;
+      --green-pale: #e4f4ec;
+      --blue: #1a3a6b;
+      --blue-pale: #e4ecf4;
+      --gray: #6b6560;
+      --gray-light: #c8c4bb;
+      --border: #ddd9cf;
+      --shadow: rgba(15, 15, 15, 0.08);
+      --shadow-md: rgba(15, 15, 15, 0.14);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ─── NOISE TEXTURE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.025;
+      pointer-events: none;
+      z-index: 1000;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* ─── HEADER ─── */
+    .header {
+      background: var(--ink);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 2px solid var(--gold);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--gold);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: white;
+      letter-spacing: 0.02em;
+    }
+
+    .logo-text span {
+      color: var(--gold-light);
+    }
+
+    .header-tagline {
+      font-size: 0.75rem;
+      color: var(--gray-light);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 300;
+    }
+
+    /* ─── HERO UPLOAD SECTION ─── */
+    .hero {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 5rem 2rem 3rem;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: var(--gold-pale);
+      border: 1px solid var(--gold-light);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero p {
+      color: var(--gray);
+      font-size: 1.05rem;
+      font-weight: 300;
+      max-width: 520px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    /* ─── UPLOAD ZONE ─── */
+    .upload-zone {
+      border: 2px dashed var(--gold-light);
+      border-radius: 12px;
+      background: var(--cream);
+      padding: 3rem 2rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-zone::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(184, 150, 46, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--gold);
+      background: var(--gold-pale);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(184, 150, 46, 0.15);
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+
+    .upload-zone h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .upload-zone p {
+      font-size: 0.85rem;
+      color: var(--gray);
+      margin: 0;
+    }
+
+    .upload-zone .file-types {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 1rem;
+    }
+
+    .badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--parchment);
+      border: 1px solid var(--border);
+      color: var(--gray);
+    }
+
+    /* ─── ANALYZE BUTTON ─── */
+    .btn-analyze {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 1.5rem;
+      padding: 14px 36px;
+      background: var(--ink);
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      border: 2px solid var(--ink);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-analyze:hover {
+      background: var(--gold);
+      border-color: var(--gold);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(184, 150, 46, 0.3);
+    }
+
+    .btn-analyze:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ─── LOADING STATE ─── */
+    .loading-overlay {
+      display: none;
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+
+    .loading-overlay.active { display: block; }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.85s linear infinite;
+      margin: 0 auto 1.2rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+    }
+
+    .loading-sub {
+      font-size: 0.82rem;
+      color: var(--gray);
+      font-weight: 300;
+    }
+
+    .loading-steps {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .loading-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      color: var(--gray-light);
+      font-weight: 300;
+      letter-spacing: 0.05em;
+    }
+
+    .loading-step .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+
+    .loading-step.active .dot { background: var(--gold); animation: pulse 1s ease infinite; }
+    .loading-step.done .dot { background: var(--green); }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* ─── ERROR STATE ─── */
+    .error-box {
+      display: none;
+      background: var(--red-pale);
+      border: 1px solid #f5c6c2;
+      border-left: 4px solid var(--red);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-top: 1.5rem;
+      text-align: left;
+      font-size: 0.875rem;
+      color: var(--red);
+    }
+
+    .error-box.active { display: flex; align-items: flex-start; gap: 10px; }
+
+    /* ─── RESULTS ─── */
+    #results { display: none; }
+    #results.active { display: block; animation: fadeUp 0.5s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .results-wrapper {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 2rem 6rem;
+    }
+
+    /* ─── SCORE BANNER ─── */
+    .score-banner {
+      background: var(--ink);
+      border-radius: 12px;
+      padding: 2rem 2.5rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2rem;
+      align-items: center;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .score-banner::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 200px; height: 100%;
+      background: radial-gradient(ellipse at right center, rgba(184, 150, 46, 0.15), transparent);
+      pointer-events: none;
+    }
+
+    .score-left h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: white;
+      margin-bottom: 0.4rem;
+    }
+
+    .score-left p {
+      color: var(--gray-light);
+      font-size: 0.875rem;
+      font-weight: 300;
+      max-width: 480px;
+      line-height: 1.6;
+    }
+
+    .score-meta {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .score-chip {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--gray-light);
+    }
+
+    .score-right {
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .risk-dial {
+      width: 100px;
+      height: 100px;
+      position: relative;
+    }
+
+    .risk-dial svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+
+    .risk-dial-track { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 8; }
+    .risk-dial-fill  { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+
+    .risk-dial-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .risk-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: white;
+      line-height: 1;
+    }
+
+    .risk-label-small {
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray-light);
+    }
+
+    .risk-badge-large {
+      margin-top: 0.75rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    /* ─── SECTION LAYOUT ─── */
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 700px) {
+      .results-grid { grid-template-columns: 1fr; }
+    }
+
+    .section-card {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .section-card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: white;
+    }
+
+    .section-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .section-header h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .section-count {
+      margin-left: auto;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--gray);
+      background: var(--parchment);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .section-body { padding: 1.25rem; }
+
+    /* ─── DANGEROUS CLAUSE CARDS ─── */
+    .clause-item {
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      margin-bottom: 0.75rem;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .clause-item:last-child { margin-bottom: 0; }
+
+    .clause-item.risk-CRITICAL { background: #fff5f5; border-color: #fdc5c0; }
+    .clause-item.risk-HIGH     { background: #fff8f2; border-color: #fdd5b0; }
+    .clause-item.risk-MEDIUM   { background: #fffcf0; border-color: #fde9a0; }
+
+    .clause-item:hover { transform: translateX(3px); }
+
+    .clause-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0.5rem;
+    }
+
+    .risk-pill {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .risk-pill.CRITICAL { background: #fde2e0; color: var(--red); }
+    .risk-pill.HIGH     { background: #fde8d4; color: var(--orange); }
+    .risk-pill.MEDIUM   { background: #fdf4d0; color: #a07010; }
+
+    .clause-title {
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .clause-category {
+      margin-left: auto;
+      font-size: 0.68rem;
+      color: var(--gray);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .clause-excerpt {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--gray);
+      background: rgba(0,0,0,0.04);
+      padding: 6px 10px;
+      border-radius: 4px;
+      border-left: 3px solid var(--border);
+      margin-bottom: 0.5rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .clause-explanation {
+      font-size: 0.8rem;
+      color: #444;
+      line-height: 1.55;
+    }
+
+    /* ─── IMPROVEMENTS ─── */
+    .improvement-item {
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      background: white;
+    }
+
+    .improvement-item:last-child { margin-bottom: 0; }
+
+    .improvement-title {
+      font-weight: 500;
+      font-size: 0.875rem;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .diff-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 600px) { .diff-block { grid-template-columns: 1fr; } }
+
+    .diff-before, .diff-after {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      padding: 8px 10px;
+      border-radius: 4px;
+      line-height: 1.5;
+    }
+
+    .diff-before {
+      background: #fff0ee;
+      border: 1px solid #fcc;
+      color: #7a2020;
+    }
+
+    .diff-after {
+      background: #efffee;
+      border: 1px solid #bbe;
+      color: #1a5c2a;
+    }
+
+    .diff-label {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .diff-before .diff-label { color: #c0392b; }
+    .diff-after  .diff-label { color: #1a6b42; }
+
+    .improvement-reason {
+      font-size: 0.78rem;
+      color: var(--gray);
+      font-style: italic;
+    }
+
+    /* ─── MISSING CLAUSES ─── */
+    .missing-item {
+      display: flex;
+      gap: 12px;
+      padding: 0.9rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      background: white;
+      align-items: flex-start;
+    }
+
+    .missing-item:last-child { margin-bottom: 0; }
+
+    .missing-icon {
+      width: 28px;
+      height: 28px;
+      background: var(--blue-pale);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .missing-name {
+      font-weight: 500;
+      font-size: 0.875rem;
+      margin-bottom: 3px;
+      color: var(--blue);
+    }
+
+    .missing-why {
+      font-size: 0.78rem;
+      color: var(--gray);
+      margin-bottom: 6px;
+    }
+
+    .missing-sample {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: #4a5568;
+      background: var(--parchment);
+      padding: 6px 8px;
+      border-radius: 4px;
+      line-height: 1.5;
+    }
+
+    /* ─── POSITIVES ─── */
+    .positive-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .positive-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 0.85rem;
+      color: var(--ink);
+    }
+
+    .positive-list li::before {
+      content: '✓';
+      color: var(--green);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ─── NEGOTIATION TIPS ─── */
+    .tips-list {
+      list-style: none;
+      counter-reset: tip-counter;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .tips-list li {
+      counter-increment: tip-counter;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 0.85rem;
+      padding: 0.75rem 1rem;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .tips-list li::before {
+      content: counter(tip-counter);
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--gold);
+      flex-shrink: 0;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* ─── PARTIES & DATES ─── */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 600px) { .meta-grid { grid-template-columns: 1fr; } }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      font-size: 0.78rem;
+      background: var(--parchment);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 20px;
+      color: var(--ink);
+    }
+
+    .date-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .date-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      padding: 6px 10px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .date-row .date-label { color: var(--gray); }
+    .date-row .date-val   { font-family: 'DM Mono', monospace; font-weight: 500; }
+
+    /* ─── RISK COLOR HELPERS ─── */
+    .risk-LOW      { color: var(--green); }
+    .risk-MEDIUM   { color: #a07010; }
+    .risk-HIGH     { color: var(--orange); }
+    .risk-CRITICAL { color: var(--red); }
+
+    .bg-risk-LOW      { background: var(--green-pale);  color: var(--green); border: 1px solid #b2dfc7; }
+    .bg-risk-MEDIUM   { background: #fdf4d0; color: #a07010; border: 1px solid #f0d86a; }
+    .bg-risk-HIGH     { background: var(--orange-pale); color: var(--orange); border: 1px solid #f5c28a; }
+    .bg-risk-CRITICAL { background: var(--red-pale);    color: var(--red);    border: 1px solid #f5c6c2; }
+
+    /* ─── FOOTER ─── */
+    .disclaimer {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.72rem;
+      color: var(--gray);
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .new-analysis-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 24px;
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.82rem;
+      color: var(--ink);
+      cursor: pointer;
+      margin-bottom: 2rem;
+      transition: all 0.18s ease;
+    }
+
+    .new-analysis-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    /* ─── EMPTY STATE ─── */
+    .empty { text-align: center; padding: 2rem; color: var(--gray); font-size: 0.875rem; }
+
+    /* ─── SELECTED FILE INDICATOR ─── */
+    .file-selected {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin-top: 1rem;
+      padding: 8px 14px;
+      background: var(--gold-pale);
+      border: 1px solid var(--gold-light);
+      border-radius: 6px;
+      font-size: 0.82rem;
+      color: var(--ink);
+    }
+
+    .file-selected.active { display: inline-flex; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">⚖</div>
+      <div class="logo-text">Lex<span>Scan</span></div>
+    </div>
+    <div class="header-tagline">AI Contract Intelligence</div>
+  </header>
+
+  <!-- UPLOAD HERO -->
+  <section class="hero" id="uploadSection">
+    <div class="hero-eyebrow">⚡ Powered by Gemini AI</div>
+    <h1>Analyse Any Contract<br/>in <em>Seconds</em></h1>
+    <p>Upload your legal contract and get a complete risk assessment, dangerous clause detection, and actionable improvements — instantly.</p>
+
+    <div class="upload-zone" id="dropZone">
+      <input type="file" id="contractFile" accept=".pdf,.docx,.txt" />
+      <span class="upload-icon">📄</span>
+      <h3>Drop your contract here</h3>
+      <p>or click to browse files</p>
+      <div class="file-types">
+        <span class="badge">PDF</span>
+        <span class="badge">DOCX</span>
+        <span class="badge">TXT</span>
+      </div>
+    </div>
+
+    <div class="file-selected" id="fileSelectedBar">
+      <span>📎</span>
+      <span id="fileSelectedName">No file selected</span>
+    </div>
+
+    <div>
+      <button class="btn-analyze" id="analyzeBtn" disabled>
+        <span>Analyse Contract</span>
+        <span>→</span>
+      </button>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading-overlay" id="loadingState">
+      <div class="spinner"></div>
+      <div class="loading-text">Analysing your contract…</div>
+      <div class="loading-sub">Running AI legal review — this may take 15–30 seconds</div>
+      <div class="loading-steps">
+        <div class="loading-step active" id="step1"><div class="dot"></div>Extracting text</div>
+        <div class="loading-step" id="step2"><div class="dot"></div>Parsing clauses</div>
+        <div class="loading-step" id="step3"><div class="dot"></div>Risk scoring</div>
+        <div class="loading-step" id="step4"><div class="dot"></div>Generating report</div>
+      </div>
+    </div>
+
+    <!-- ERROR -->
+    <div class="error-box" id="errorBox">
+      <span>⚠</span>
+      <span id="errorText">An error occurred.</span>
+    </div>
+  </section>
+
+  <!-- RESULTS SECTION -->
+  <section id="results">
+    <div class="results-wrapper">
+
+      <button class="new-analysis-btn" id="newAnalysisBtn">← Analyse another contract</button>
+
+      <!-- SCORE BANNER -->
+      <div class="score-banner" id="scoreBanner">
+        <div class="score-left">
+          <h2 id="contractType">Contract Analysis</h2>
+          <p id="executiveSummary">Loading summary…</p>
+          <div class="score-meta" id="scoreMeta"></div>
+        </div>
+        <div class="score-right">
+          <div class="risk-dial">
+            <svg viewBox="0 0 100 100">
+              <circle class="risk-dial-track" cx="50" cy="50" r="40" />
+              <circle class="risk-dial-fill" id="dialFill" cx="50" cy="50" r="40"
+                stroke-dasharray="251.2" stroke-dashoffset="251.2" />
+            </svg>
+            <div class="risk-dial-center">
+              <div class="risk-number" id="riskScore">0</div>
+              <div class="risk-label-small">Risk</div>
+            </div>
+          </div>
+          <div id="riskBadgeLarge" class="risk-badge-large"></div>
+        </div>
+      </div>
+
+      <!-- PARTIES & DATES -->
+      <div class="meta-grid">
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-icon" style="background:#eef2ff;">👥</div>
+            <h3>Parties Involved</h3>
+          </div>
+          <div class="section-body">
+            <div class="tag-list" id="partiesList"></div>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-icon" style="background:#fff8e1;">📅</div>
+            <h3>Key Dates</h3>
+          </div>
+          <div class="section-body">
+            <div class="date-list" id="datesList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DANGEROUS CLAUSES + IMPROVEMENTS (2-col) -->
+      <div class="results-grid">
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-icon" style="background:#fdecea;">🚨</div>
+            <h3>Dangerous Clauses</h3>
+            <span class="section-count" id="dangerCount">0</span>
+          </div>
+          <div class="section-body" id="dangerousClauses"></div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-icon" style="background:#e8f5e9;">✏️</div>
+            <h3>Suggested Improvements</h3>
+            <span class="section-count" id="improveCount">0</span>
+          </div>
+          <div class="section-body" id="improvements"></div>
+        </div>
+      </div>
+
+      <!-- MISSING CLAUSES - FULL WIDTH -->
+      <div class="results-grid">
+        <div class="section-card full-width">
+          <div class="section-header">
+            <div class="section-icon" style="background:#e3f2fd;">➕</div>
+            <h3>Missing Clauses to Add</h3>
+            <span class="section-count" id="missingCount">0</span>
+          </div>
+          <div class="section-body" id="missingClauses"></div>
+        </div>
+      </div>
+
+      <!-- POSITIVE ASPECTS + NEGOTIATION TIPS (2-col) -->
+      <div class="results-grid">
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-icon" style="background:#e8f5e9;">✅</div>
+            <h3>What the Contract Does Well</h3>
+          </div>
+          <div class="section-body">
+            <ul class="positive-list" id="positiveAspects"></ul>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-icon" style="background:#fff8e1;">💡</div>
+            <h3>Negotiation Leverage Points</h3>
+          </div>
+          <div class="section-body">
+            <ol class="tips-list" id="negotiationTips"></ol>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /results-wrapper -->
+
+    <div class="disclaimer">
+      ⚠️ LexScan is an AI-powered tool for informational purposes only. This analysis does not constitute legal advice. Always consult a qualified legal professional before signing any contract.
+    </div>
+  </section>
+
+  <script>
+    const API_BASE = 'http://127.0.0.1:8000';
+
+    const fileInput     = document.getElementById('contractFile');
+    const dropZone      = document.getElementById('dropZone');
+    const analyzeBtn    = document.getElementById('analyzeBtn');
+    const loadingState  = document.getElementById('loadingState');
+    const errorBox      = document.getElementById('errorBox');
+    const errorText     = document.getElementById('errorText');
+    const resultsSection = document.getElementById('results');
+    const uploadSection  = document.getElementById('uploadSection');
+    const fileSelectedBar = document.getElementById('fileSelectedBar');
+    const fileSelectedName = document.getElementById('fileSelectedName');
+
+    // ─── FILE SELECTION ───
+    fileInput.addEventListener('change', () => {
+      const f = fileInput.files[0];
+      if (f) {
+        fileSelectedName.textContent = f.name;
+        fileSelectedBar.classList.add('active');
+        analyzeBtn.disabled = false;
+      }
+    });
+
+    // ─── DRAG & DROP ───
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const f = e.dataTransfer.files[0];
+      if (f) {
+        fileInput.files = e.dataTransfer.files;
+        fileSelectedName.textContent = f.name;
+        fileSelectedBar.classList.add('active');
+        analyzeBtn.disabled = false;
+      }
+    });
+
+    // ─── LOADING STEPS ANIMATION ───
+    let stepInterval;
+    function startLoadingSteps() {
+      const steps = ['step1','step2','step3','step4'];
+      let i = 0;
+      steps.forEach(s => {
+        document.getElementById(s).className = 'loading-step';
+      });
+      document.getElementById(steps[0]).classList.add('active');
+      stepInterval = setInterval(() => {
+        document.getElementById(steps[i]).classList.remove('active');
+        document.getElementById(steps[i]).classList.add('done');
+        i++;
+        if (i < steps.length) {
+          document.getElementById(steps[i]).classList.add('active');
+        } else {
+          clearInterval(stepInterval);
+        }
+      }, 4000);
+    }
+
+    // ─── ANALYSE ───
+    analyzeBtn.addEventListener('click', async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      // UI state
+      analyzeBtn.disabled = true;
+      errorBox.classList.remove('active');
+      loadingState.classList.add('active');
+      startLoadingSteps();
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch(`${API_BASE}/analyze`, { method: 'POST', body: formData });
+        clearInterval(stepInterval);
+        loadingState.classList.remove('active');
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ detail: 'Unknown error' }));
+          throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        renderResults(data);
+
+      } catch (err) {
+        loadingState.classList.remove('active');
+        errorText.textContent = err.message || 'Failed to connect to the server. Make sure the backend is running.';
+        errorBox.classList.add('active');
+        analyzeBtn.disabled = false;
+      }
+    });
+
+    // ─── NEW ANALYSIS ───
+    document.getElementById('newAnalysisBtn').addEventListener('click', () => {
+      resultsSection.classList.remove('active');
+      uploadSection.style.display = '';
+      fileInput.value = '';
+      fileSelectedBar.classList.remove('active');
+      analyzeBtn.disabled = true;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ─── RENDER ───
+    function renderResults(data) {
+      const a = data.analysis || {};
+
+      // Show results, hide upload
+      uploadSection.style.display = 'none';
+      resultsSection.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // ── Score Banner ──
+      document.getElementById('contractType').textContent = a.contract_type || 'Contract Analysis';
+      document.getElementById('executiveSummary').textContent = a.executive_summary || '';
+
+      const score = a.risk_score || 0;
+      const riskLevel = a.overall_risk_level || 'MEDIUM';
+
+      document.getElementById('riskScore').textContent = score;
+
+      const colors = { LOW: '#1a6b42', MEDIUM: '#a07010', HIGH: '#d4681a', CRITICAL: '#c0392b' };
+      const dialFill = document.getElementById('dialFill');
+      dialFill.style.stroke = colors[riskLevel] || '#a07010';
+      setTimeout(() => {
+        const circumference = 251.2;
+        const offset = circumference - (score / 100) * circumference;
+        dialFill.style.strokeDashoffset = offset;
+      }, 100);
+
+      const badge = document.getElementById('riskBadgeLarge');
+      badge.textContent = riskLevel;
+      badge.className = `risk-badge-large bg-risk-${riskLevel}`;
+
+      // Meta chips
+      const metaEl = document.getElementById('scoreMeta');
+      metaEl.innerHTML = `
+        <span class="score-chip">📄 ${data.filename}</span>
+        <span class="score-chip">📏 ${(data.char_count/1000).toFixed(1)}k chars</span>
+      `;
+
+      // ── Parties ──
+      const partiesEl = document.getElementById('partiesList');
+      partiesEl.innerHTML = '';
+      (a.parties_involved || []).forEach(p => {
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.textContent = p;
+        partiesEl.appendChild(tag);
+      });
+      if (!a.parties_involved?.length) partiesEl.innerHTML = '<span class="tag" style="color:var(--gray)">Not identified</span>';
+
+      // ── Key Dates ──
+      const datesEl = document.getElementById('datesList');
+      datesEl.innerHTML = '';
+      (a.key_dates || []).forEach(d => {
+        datesEl.innerHTML += `
+          <div class="date-row">
+            <span class="date-label">${esc(d.label)}</span>
+            <span class="date-val">${esc(d.date)}</span>
+          </div>`;
+      });
+      if (!a.key_dates?.length) datesEl.innerHTML = '<div style="color:var(--gray);font-size:.82rem;">No specific dates found</div>';
+
+      // ── Dangerous Clauses ──
+      const dcEl = document.getElementById('dangerousClauses');
+      const dcList = a.dangerous_clauses || [];
+      document.getElementById('dangerCount').textContent = dcList.length;
+      dcEl.innerHTML = '';
+      if (!dcList.length) {
+        dcEl.innerHTML = '<div class="empty">✅ No particularly dangerous clauses identified.</div>';
+      } else {
+        dcList.forEach(c => {
+          dcEl.innerHTML += `
+            <div class="clause-item risk-${c.risk_level}">
+              <div class="clause-top">
+                <span class="risk-pill ${c.risk_level}">${c.risk_level}</span>
+                <span class="clause-title">${esc(c.title)}</span>
+                <span class="clause-category">${esc(c.category || '')}</span>
+              </div>
+              ${c.original_text ? `<div class="clause-excerpt">"${esc(c.original_text)}"</div>` : ''}
+              <div class="clause-explanation">${esc(c.risk_explanation)}</div>
+            </div>`;
+        });
+      }
+
+      // ── Improvements ──
+      const impEl = document.getElementById('improvements');
+      const impList = a.suggested_improvements || [];
+      document.getElementById('improveCount').textContent = impList.length;
+      impEl.innerHTML = '';
+      if (!impList.length) {
+        impEl.innerHTML = '<div class="empty">No specific improvements flagged.</div>';
+      } else {
+        impList.forEach(s => {
+          impEl.innerHTML += `
+            <div class="improvement-item">
+              <div class="improvement-title">✏️ ${esc(s.title)}</div>
+              <div class="diff-block">
+                <div class="diff-before">
+                  <div class="diff-label">Before</div>
+                  ${esc(s.original_text || '—')}
+                </div>
+                <div class="diff-after">
+                  <div class="diff-label">After</div>
+                  ${esc(s.improved_text || '—')}
+                </div>
+              </div>
+              <div class="improvement-reason">💡 ${esc(s.reason)}</div>
+            </div>`;
+        });
+      }
+
+      // ── Missing Clauses ──
+      const mcEl = document.getElementById('missingClauses');
+      const mcList = a.missing_clauses || [];
+      document.getElementById('missingCount').textContent = mcList.length;
+      mcEl.innerHTML = '';
+      if (!mcList.length) {
+        mcEl.innerHTML = '<div class="empty">No critical missing clauses identified.</div>';
+      } else {
+        mcList.forEach(m => {
+          mcEl.innerHTML += `
+            <div class="missing-item">
+              <div class="missing-icon">➕</div>
+              <div style="flex:1">
+                <div class="missing-name">${esc(m.clause_name)}</div>
+                <div class="missing-why">${esc(m.why_needed)}</div>
+                ${m.suggested_text ? `<div class="missing-sample">${esc(m.suggested_text)}</div>` : ''}
+              </div>
+            </div>`;
+        });
+      }
+
+      // ── Positive Aspects ──
+      const posEl = document.getElementById('positiveAspects');
+      const posList = a.positive_aspects || [];
+      posEl.innerHTML = '';
+      if (!posList.length) {
+        posEl.innerHTML = '<li style="color:var(--gray)">None identified</li>';
+      } else {
+        posList.forEach(p => {
+          posEl.innerHTML += `<li>${esc(p)}</li>`;
+        });
+      }
+
+      // ── Negotiation Tips ──
+      const tipsEl = document.getElementById('negotiationTips');
+      const tipsList = a.negotiation_tips || [];
+      tipsEl.innerHTML = '';
+      if (!tipsList.length) {
+        tipsEl.innerHTML = '<li style="color:var(--gray)">No tips generated</li>';
+      } else {
+        tipsList.forEach(t => {
+          tipsEl.innerHTML += `<li>${esc(t)}</li>`;
+        });
+      }
+    }
+
+    // ─── XSS SAFE ───
+    function esc(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
