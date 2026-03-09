@@ -73,17 +73,5 @@ legal-analyzer/
 
 ---
 
-## Key Improvements Over Original
-
-| Issue | Fix |
-|---|---|
-| Per-paragraph API calls (100x slower, unstructured) | Single holistic contract analysis call |
-| Unstructured text response | Strict JSON schema with 8 analysis categories |
-| Raw text dump in UI | Professional cards with risk badges, diff views |
-| No error handling | Graceful errors with user-friendly messages |
-| PDF async read bug | Proper `await file.read()` + `io.BytesIO` |
-| Markdown in JSON response | Regex stripping of code fences before parse |
-
----
 
 > ⚠️ **Disclaimer:** LexScan is for informational purposes only and does not constitute legal advice. Always consult a qualified legal professional before signing any contract.
